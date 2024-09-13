@@ -26,7 +26,8 @@ jobs:
     - name: Deploy Bicep template
       uses: azure/arm-deploy@v2
       with:
-        scope: resourceGroup
-        resource-group: ${{ secrets.AZURE_RG }}
-        template-file: src/InfrastructureAsCode/main.bicep
-        deployment-name: TechExcelDeployment
+        scope: resourcegroup
+        resourceGroupName: ${{ secrets.AZURE_RG }}
+        template: src/InfrastructureAsCode/main.bicep
+        deploymentName: TechExcelDeployment
+        failOnStdErr: true
