@@ -20,7 +20,7 @@ jobs:
         federated-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Deploy Bicep template
-      uses: azure/arm-deploy@v1
+      uses: azure/arm-deploy@v2
       with:
         scope: resourceGroup
         resource-group: ${{ secrets.AZURE_RG }}
