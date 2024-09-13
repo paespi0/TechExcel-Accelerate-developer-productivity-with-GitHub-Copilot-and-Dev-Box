@@ -2,6 +2,11 @@ name: Deploy to Azure
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (dev, test, prod)'
+        required: true
+        default: 'dev'
 
 permissions:
   id-token: write
@@ -29,5 +34,7 @@ jobs:
         scope: resourcegroup
         resourceGroupName: ${{ secrets.AZURE_RG }}
         template: src/InfrastructureAsCode/main.bicep
-        deploymentName: TechExcelDeployment
+        deploymentName: TechExcelDeployment-${{ github.event.inputs.environment }}
+        parameters: |
+          environment=${{ github.event.inputs.environment }}
         failOnStdErr: true

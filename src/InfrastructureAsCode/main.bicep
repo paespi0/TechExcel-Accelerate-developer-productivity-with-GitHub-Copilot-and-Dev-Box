@@ -1,9 +1,11 @@
-// @description('Environment of the web app')
-// param environment string = 'dev'
+// Parameters
+@description('Environment of the web app')
+param environment string = 'dev'
 
 @description('Location of services')
 param location string = resourceGroup().location
 
+// Variables
 var webAppName = '${uniqueString(resourceGroup().id)}-${environment}'
 var appServicePlanName = '${uniqueString(resourceGroup().id)}-mpnp-asp'
 var logAnalyticsName = '${uniqueString(resourceGroup().id)}-mpnp-la'
@@ -14,6 +16,7 @@ var registrySku = 'Standard'
 var imageName = 'techexcel/dotnetcoreapp'
 var startupCommand = ''
 
+// App Service Plan
 resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   name: appServicePlanName
   location: location
@@ -26,6 +29,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   }
 }
 
+// Web App
 resource webApp 'Microsoft.Web/sites@2021-02-01' = {
   name: webAppName
   location: location
@@ -38,6 +42,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
   }
 }
 
+// Application Insights
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
   location: location
@@ -47,6 +52,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+// Azure Container Registry
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: registryName
   location: location
@@ -57,22 +63,3 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-06-01-pr
     adminUserEnabled: true
   }
 }
-
-// Deploy Web Apps for each environment
-var environments = [
-  'dev'
-  'test'
-  'prod'
-]
-
-resource webApps 'Microsoft.Web/sites@2021-02-01' = [for env in environments: {
-  name: '${uniqueString(resourceGroup().id)}-${env}'
-  location: location
-  properties: {
-    serverFarmId: appServicePlan.id
-    siteConfig: {
-      linuxFxVersion: 'DOCKER|${imageName}'
-      appCommandLine: startupCommand
-    }
-  }
-}]
