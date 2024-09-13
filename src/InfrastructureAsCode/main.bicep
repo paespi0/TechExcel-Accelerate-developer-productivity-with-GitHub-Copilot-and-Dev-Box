@@ -10,7 +10,7 @@ var webAppName = '${uniqueString(resourceGroup().id)}-${environment}'
 var appServicePlanName = '${uniqueString(resourceGroup().id)}-mpnp-asp'
 var logAnalyticsName = '${uniqueString(resourceGroup().id)}-mpnp-la'
 var appInsightsName = '${uniqueString(resourceGroup().id)}-mpnp-ai'
-var sku = 'S1'
+var sku = 'P0V3'
 var registryName = '${uniqueString(resourceGroup().id)}mpnpreg'
 var registrySku = 'Standard'
 var imageName = 'techexcel/dotnetcoreapp'
@@ -42,13 +42,27 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
   }
 }
 
-// Application Insights
-resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
+  name: logAnalyticsName
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+    retentionInDays: 90
+    workspaceCapping: {
+      dailyQuotaGb: 1
+    }
+  }
+}
+
+resource appInsights 'Microsoft.Insights/components@2020-02-02-preview' = {
   name: appInsightsName
   location: location
   kind: 'web'
   properties: {
     Application_Type: 'web'
+    WorkspaceResourceId: logAnalyticsWorkspace.id
   }
 }
 
